@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mlflow:
+    image: python:3.11-slim
+    container_name: aurix-mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_BACKEND_STORE_URI: sqlite:///mlflow/mlflow.db
+      MLFLOW_DEFAULT_ARTIFACT_ROOT: /mlflow/artifacts
+    volumes:
+      - mlflow_data:/mlflow
+    command: >
+      sh -c "pip install mlflow psycopg2-binary boto3 &&
+             mlflow server
+               --host 0.0.0.0
+               --port 5000
+               --backend-store-uri sqlite:///mlflow/mlflow.db
+               --default-artifact-root /mlflow/artifacts"
+    networks:
+      - mlops-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ml-serving:
+    build:
+      context: ../..
+      dockerfile: ml/ops/serving/Dockerfile
+    container_name: aurix-ml-serving
+    ports:
+      - "8000:8000"
+    environment:
+      AUREUS_MODEL_PATH: /app/models/fraud_detection_model.pkl
+    volumes:
+      - ./models:/app/models
+    networks:
+      - mlops-network
+    profiles:
+      - serve
+
+volumes:
+  mlflow_data:
+
+networks:
+  mlops-network:
+    driver: bridge

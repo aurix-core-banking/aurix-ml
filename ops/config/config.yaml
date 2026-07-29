@@ -1,0 +1,29 @@
+training:
+  model_name: fraud_detection
+  sample_size: 5000
+  test_size: 0.2
+  random_state: 42
+  target_column: is_fraud
+
+serving:
+  host: "0.0.0.0"
+  port: 8000
+  model_path: "models/fraud_detection_model.pkl"
+  timeout_seconds: 30
+  max_batch_size: 100
+
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "aurix-fraud-detection"
+  registry_model_name: "aurix-fraud-detection"
+
+monitoring:
+  drift_threshold: 0.15
+  min_samples_drift: 500
+  check_interval_hours: 24
+  metrics_window_days: 7
+
+storage:
+  models_dir: "models"
+  artifacts_dir: "artifacts"
+  metrics_dir: "metrics"

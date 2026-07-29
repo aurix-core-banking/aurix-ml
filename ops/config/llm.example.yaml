@@ -1,0 +1,141 @@
+# ============================================================================
+# aurix-ml — Exemplos de configuração de LLM
+# Copie este arquivo para llm.yaml e ajuste conforme seu ambiente.
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# DESENVOLVIMENTO LOCAL (sem custos, sem credenciais)
+# ---------------------------------------------------------------------------
+
+# Opção A: Mock offline — para testes unitários e CI
+mock:
+  provider: mock
+  model: mock
+  response: "Resposta simulada do Aurix LLM para testes."
+
+# Opção B: Ollama local — modelos open-source rodando na sua máquina
+#   Instalar: curl -fsSL https://ollama.com/install.sh | sh
+#   Baixar:   ollama pull llama3.2   (2GB) | mistral:7b (4GB) | qwen2.5:14b (9GB)
+ollama_fast:
+  provider: ollama
+  model: llama3.2          # 3B params — rápido, bom para classificação
+  base_url: http://localhost:11434
+  timeout: 60
+  keep_alive: "10m"
+
+ollama_balanced:
+  provider: ollama
+  model: mistral:7b         # 7B params — equilíbrio qualidade/velocidade
+  base_url: http://localhost:11434
+  timeout: 120
+
+ollama_quality:
+  provider: ollama
+  model: qwen2.5:14b        # 14B — melhor para compliance e redação
+  base_url: http://localhost:11434
+  timeout: 180
+
+ollama_ptbr:
+  provider: ollama
+  model: maritaca            # modelo especializado em português brasileiro
+  base_url: http://localhost:11434
+  timeout: 120
+
+# Opção C: LM Studio — interface gráfica para modelos GGUF locais
+#   Download: https://lmstudio.ai
+lmstudio:
+  provider: lmstudio
+  model: lmstudio-community/Meta-Llama-3.2-3B-Instruct-GGUF
+  base_url: http://localhost:1234/v1
+  timeout: 120
+
+# Opção D: HuggingFace — inferência direta (requer GPU/RAM suficiente)
+huggingface_local:
+  provider: huggingface
+  model: microsoft/Phi-3.5-mini-instruct   # 3.8B — bom em CPU
+  device: auto                              # cpu | cuda | mps | auto
+  load_in_4bit: false
+  load_in_8bit: false
+
+huggingface_4bit:
+  provider: huggingface
+  model: Qwen/Qwen2.5-7B-Instruct
+  device: cuda
+  load_in_4bit: true                        # quantização 4-bit: usa ~4GB VRAM
+
+# ---------------------------------------------------------------------------
+# HOMOLOGAÇÃO / STAGING
+# ---------------------------------------------------------------------------
+
+# vLLM self-hosted — alta performance, ideal para staging
+vllm_staging:
+  provider: vllm
+  model: meta-llama/Meta-Llama-3.2-8B-Instruct
+  base_url: http://vllm-staging.aurix.internal:8000/v1
+  timeout: 60
+
+# llama.cpp server — leve, ideal para VMs sem GPU
+llamacpp_staging:
+  provider: llamacpp
+  model: llama3.2
+  base_url: http://llamacpp-staging.aurix.internal:8080/v1
+  timeout: 60
+
+# ---------------------------------------------------------------------------
+# PRODUÇÃO
+# ---------------------------------------------------------------------------
+
+# AWS Bedrock — recomendado para produção no Brasil (região sa-east-1)
+bedrock_nova_lite:
+  provider: bedrock
+  model: amazon.nova-lite-v1:0    # rápido, custo baixo
+  region: sa-east-1               # São Paulo — menor latência
+  timeout: 30
+
+bedrock_nova_pro:
+  provider: bedrock
+  model: amazon.nova-pro-v1:0     # alta qualidade para decisões críticas
+  region: sa-east-1
+  assume_role_arn: arn:aws:iam::123456789012:role/aurix-ml-llm-prod
+
+bedrock_claude:
+  provider: bedrock
+  model: anthropic.claude-3-5-haiku-20241022-v1:0
+  region: us-east-1
+
+# OpenAI — fallback ou para funcionalidades específicas
+openai_mini:
+  provider: openai
+  model: gpt-4o-mini
+  # api_key: definir via env OPENAI_API_KEY
+
+openai_full:
+  provider: openai
+  model: gpt-4o
+
+# Azure OpenAI — para clientes com contrato Microsoft
+azure_openai:
+  provider: azure
+  model: gpt-4o-mini
+  base_url: https://aurix-openai.openai.azure.com/
+  # api_key: definir via env AZURE_OPENAI_API_KEY
+
+# Google Gemini
+gemini_flash:
+  provider: gemini
+  model: gemini-2.0-flash
+  # api_key: definir via env GOOGLE_API_KEY
+
+# ---------------------------------------------------------------------------
+# CONFIGURAÇÃO ATIVA POR AMBIENTE
+# ---------------------------------------------------------------------------
+# Selecionar no código com:
+#   config = load_config("configs/llm.yaml")
+#   llm = create_llm(config["active"])
+#
+# Ou via env var AUREUS_LLM_PROVIDER / AUREUS_LLM_MODEL
+
+active:
+  provider: ollama             # ← trocar para bedrock_nova_lite em produção
+  model: llama3.2
+  base_url: http://localhost:11434
