@@ -129,9 +129,9 @@ class FraudDetectionModel:
             # Simular target baseado em regras de negócio
             df[target_column] = (
                 (df['valor'] > df['valor'].quantile(0.99)) |
-                (df['hour'] < 6) |
-                (df['hour'] > 22) |
-                (df['day_of_week'] >= 5) |
+                (X['hour'] < 6) |
+                (X['hour'] > 22) |
+                (X['day_of_week'] >= 5) |
                 (df['score_risco'] > 0.8)
             ).astype(int)
         
@@ -344,7 +344,7 @@ def generate_sample_data(n_samples: int = 1000) -> pd.DataFrame:
         'conta_id': np.random.randint(1, 100, n_samples),
         'tipo_transacao': np.random.choice(['PIX', 'TED', 'DOC', 'SAQUE', 'DEPOSITO'], n_samples),
         'valor': np.random.exponential(500, n_samples),
-        'data_transacao': pd.date_range('2024-01-01', periods=n_samples, freq='H'),
+        'data_transacao': pd.date_range('2024-01-01', periods=n_samples, freq='h'),
         'status': np.random.choice(['APROVADA', 'REJEITADA', 'PENDENTE'], n_samples, p=[0.8, 0.15, 0.05]),
         'canal': np.random.choice(['MOBILE', 'WEB', 'ATM', 'AGENCIA'], n_samples, p=[0.6, 0.3, 0.08, 0.02]),
         'dispositivo': np.random.choice(['iPhone 14', 'Samsung Galaxy', 'Chrome', 'Firefox'], n_samples),

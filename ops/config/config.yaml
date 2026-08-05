@@ -22,6 +22,20 @@ monitoring:
   min_samples_drift: 500
   check_interval_hours: 24
   metrics_window_days: 7
+  # Model drift
+  model_drift_threshold: 0.1
+  model_baseline_file: "artifacts/model_baseline_metrics.json"
+  # Alertas
+  alerting:
+    slack_webhook_env: "ML_SLACK_WEBHOOK_URL"
+    email_to_env: "ML_ALERTAS_EMAIL_TO"
+  # Exporter Prometheus para o Grafana
+  exporter:
+    port: 9101
+  # Retreino automático
+  retraining:
+    enabled: true
+    promote_to_production: true
 
 storage:
   models_dir: "models"
