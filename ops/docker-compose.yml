@@ -42,6 +42,22 @@ services:
     profiles:
       - serve
 
+  drift-exporter:
+    image: python:3.11-slim
+    container_name: aurix-ml-drift-exporter
+    ports:
+      - "9101:9101"
+    command: >
+      sh -c "pip install prometheus-client pyyaml &&
+             cd /app/ops && python -m monitoring.prometheus_exporter --port 9101"
+    volumes:
+      - .:/app/ops
+      - ../models:/app/models
+    networks:
+      - mlops-network
+    profiles:
+      - monitoring
+
 volumes:
   mlflow_data:
 

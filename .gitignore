@@ -23,6 +23,9 @@ mlruns/
 mlartifacts/
 mlflow.db
 
+# MLOps gerados
+artifacts/
+
 # IDE
 .idea/
 .vscode/
