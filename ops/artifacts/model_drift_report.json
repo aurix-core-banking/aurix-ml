@@ -1,0 +1,39 @@
+{
+  "drift_detected": false,
+  "metricas": {
+    "auc": {
+      "baseline": 0.754,
+      "atual": 0.6502,
+      "degradacao": 0.1377,
+      "drifted": true
+    },
+    "precisao": {
+      "baseline": 0.0167,
+      "atual": 0.0164,
+      "degradacao": 0.0161,
+      "drifted": false
+    },
+    "recall": {
+      "baseline": 1.0,
+      "atual": 1.0,
+      "degradacao": 0.0,
+      "drifted": false
+    },
+    "f1": {
+      "baseline": 0.0329,
+      "atual": 0.0324,
+      "degradacao": 0.0159,
+      "drifted": false
+    },
+    "acuracia": {
+      "baseline": 0.4118,
+      "atual": 0.402,
+      "degradacao": 0.0238,
+      "drifted": false
+    }
+  },
+  "overall_degradation": 0.0387,
+  "timestamp": "2026-08-05T01:17:55.519426Z",
+  "threshold": 0.1,
+  "mlflow_run_id": null
+}

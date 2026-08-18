@@ -6,6 +6,8 @@ Gera dados de exemplo, treina e persiste modelos em disco.
 import argparse
 from pathlib import Path
 
+import numpy as np
+
 from fraud_detection_model import (
     FraudDetectionModel,
     CreditScoringModel,
@@ -18,6 +20,7 @@ from customer_segmentation_model import CustomerSegmentationModel, generate_segm
 def main():
     parser = argparse.ArgumentParser(description="Treina todos os modelos AUREUS ML")
     parser.add_argument("--output-dir", type=str, default="models", help="Diretorio de saida dos .pkl")
+    parser.add_argument("--seed", type=int, default=42, help="Semente global de reprodutibilidade")
     parser.add_argument("--fraud-samples", type=int, default=5000)
     parser.add_argument("--default-samples", type=int, default=2000)
     parser.add_argument("--segmentation-samples", type=int, default=2000)
@@ -26,6 +29,9 @@ def main():
     parser.add_argument("--skip-default", action="store_true")
     parser.add_argument("--skip-segmentation", action="store_true")
     args = parser.parse_args()
+
+    # Reproductibilidade: mesma semente para todos os modelos treinados no script.
+    np.random.seed(args.seed)
 
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)

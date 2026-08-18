@@ -1,0 +1,67 @@
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 0.0
+python_gc_objects_collected_total{generation="1"} 215.0
+python_gc_objects_collected_total{generation="2"} 0.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 0.0
+python_gc_collections_total{generation="1"} 3.0
+python_gc_collections_total{generation="2"} 0.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="14",patchlevel="4",version="3.14.4"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 3.663872e+07
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 2.7705344e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.78589267543e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 0.06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 5.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP aurix_ml_data_drift_score Score de data drift (PSI normalizado)
+# TYPE aurix_ml_data_drift_score gauge
+aurix_ml_data_drift_score 0.0587
+# HELP aurix_ml_data_drift_detected Data drift detectado (1/0)
+# TYPE aurix_ml_data_drift_detected gauge
+aurix_ml_data_drift_detected 0.0
+# HELP aurix_ml_model_degradation Degradação de performance do modelo (model drift)
+# TYPE aurix_ml_model_degradation gauge
+aurix_ml_model_degradation 0.0387
+# HELP aurix_ml_model_drift_detected Model drift detectado (1/0)
+# TYPE aurix_ml_model_drift_detected gauge
+aurix_ml_model_drift_detected 0.0
+# HELP aurix_ml_feature_drift_score Score de drift por feature
+# TYPE aurix_ml_feature_drift_score gauge
+aurix_ml_feature_drift_score{feature="valor"} 0.0249
+aurix_ml_feature_drift_score{feature="score_risco"} 0.0261
+aurix_ml_feature_drift_score{feature="latitude"} 0.0567
+aurix_ml_feature_drift_score{feature="longitude"} 0.0232
+aurix_ml_feature_drift_score{feature="tempo_processamento_ms"} 0.0587
+aurix_ml_feature_drift_score{feature="tipo_transacao"} 0.0046
+aurix_ml_feature_drift_score{feature="status"} 0.0054
+aurix_ml_feature_drift_score{feature="canal"} 0.0361
+aurix_ml_feature_drift_score{feature="cidade"} 0.0107
+aurix_ml_feature_drift_score{feature="estado"} 0.0178
+# HELP aurix_ml_metric_degradation Degradação por métrica
+# TYPE aurix_ml_metric_degradation gauge
+aurix_ml_metric_degradation{metrica="auc"} 0.1377
+aurix_ml_metric_degradation{metrica="precisao"} 0.0161
+aurix_ml_metric_degradation{metrica="recall"} 0.0
+aurix_ml_metric_degradation{metrica="f1"} 0.0159
+aurix_ml_metric_degradation{metrica="acuracia"} 0.0238
