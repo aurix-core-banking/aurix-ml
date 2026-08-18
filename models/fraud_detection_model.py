@@ -119,6 +119,8 @@ class FraudDetectionModel:
     
     def train(self, df: pd.DataFrame, target_column: str = 'is_fraud'):
         """Treina o modelo de detecção de fraude"""
+        # Reproductibilidade das features sintéticas (transactions_last_hour, etc.)
+        np.random.seed(42)
         print("Preparando dados para treinamento...")
         
         # Preparar features
@@ -374,6 +376,7 @@ def generate_sample_data(n_samples: int = 1000) -> pd.DataFrame:
 
 def main():
     """Função principal para treinar e testar os modelos"""
+    np.random.seed(42)
     print("=== AUREUS Machine Learning - Detecção de Fraude ===")
     
     # Gerar dados de exemplo

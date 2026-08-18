@@ -8,6 +8,7 @@ import yaml
 import logging
 from datetime import datetime
 
+import numpy as np
 import mlflow
 import mlflow.sklearn
 
@@ -15,6 +16,12 @@ from fraud_detection_model import FraudDetectionModel, generate_sample_data
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+# Constantes de versionamento/registro (padrao consistente entre os pipelines).
+MODEL_NAME = "fraud_detection"
+MODEL_VERSION = "1.0.0"
+DEFAULT_SEED = 42
+FRAMEWORK = "scikit-learn"
 
 
 def load_config(config_path: Path) -> dict:
@@ -27,6 +34,10 @@ def run_training(config: dict, model_dir: Path, use_mlflow: bool = True) -> dict
     mlflow_cfg = config.get("mlflow", {})
     sample_size = train_cfg.get("sample_size", 5000)
     target_col = train_cfg.get("target_column", "is_fraud")
+    random_state = train_cfg.get("random_state", DEFAULT_SEED)
+
+    # Reproductibilidade global das features sinteticas geradas no treino.
+    np.random.seed(DEFAULT_SEED)
 
     logger.info("Generating sample data (size=%s)...", sample_size)
     df = generate_sample_data(n_samples=sample_size)
@@ -48,6 +59,15 @@ def run_training(config: dict, model_dir: Path, use_mlflow: bool = True) -> dict
 
             mlflow.log_param("sample_size", sample_size)
             mlflow.log_param("target_column", target_col)
+            mlflow.log_param("random_state", random_state)
+            mlflow.log_param("seed", DEFAULT_SEED)
+
+            # Tags de versionamento e registro (padrao consistente entre pipelines).
+            mlflow.set_tag("model_name", MODEL_NAME)
+            mlflow.set_tag("model_version", MODEL_VERSION)
+            mlflow.set_tag("framework", FRAMEWORK)
+            mlflow.set_tag("regime", "ensemble_isolation_random_forest")
+            mlflow.set_tag("governance_regimes", "n/a")
 
             model_dir.mkdir(parents=True, exist_ok=True)
             model_path = model_dir / "fraud_detection_model.pkl"

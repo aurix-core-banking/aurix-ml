@@ -1,0 +1,59 @@
+{
+  "drift_detected": false,
+  "features": {
+    "valor": {
+      "drift_score": 0.0249,
+      "psi": 0.0062,
+      "drifted": false
+    },
+    "score_risco": {
+      "drift_score": 0.0261,
+      "psi": 0.0065,
+      "drifted": false
+    },
+    "latitude": {
+      "drift_score": 0.0567,
+      "psi": 0.0142,
+      "drifted": false
+    },
+    "longitude": {
+      "drift_score": 0.0232,
+      "psi": 0.0058,
+      "drifted": false
+    },
+    "tempo_processamento_ms": {
+      "drift_score": 0.0587,
+      "psi": 0.0147,
+      "drifted": false
+    },
+    "tipo_transacao": {
+      "drift_score": 0.0046,
+      "psi": 0.0011,
+      "drifted": false
+    },
+    "status": {
+      "drift_score": 0.0054,
+      "psi": 0.0014,
+      "drifted": false
+    },
+    "canal": {
+      "drift_score": 0.0361,
+      "psi": 0.009,
+      "drifted": false
+    },
+    "cidade": {
+      "drift_score": 0.0107,
+      "psi": 0.0027,
+      "drifted": false
+    },
+    "estado": {
+      "drift_score": 0.0178,
+      "psi": 0.0045,
+      "drifted": false
+    }
+  },
+  "overall_score": 0.0587,
+  "timestamp": "2026-08-05T01:17:53.308067Z",
+  "threshold": 0.15,
+  "mlflow_run_id": null
+}

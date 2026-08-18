@@ -5,6 +5,19 @@ training:
   random_state: 42
   target_column: is_fraud
 
+# Pipeline de treino do modelo de risco de credito (models/train_credit_pipeline.py)
+credit_training:
+  model_name: credit_risk
+  sample_size: 5000
+  random_state: 42
+  target_column: inadimplente
+  regime: r3
+  governance_samples: 200
+  mlflow:
+    tracking_uri: "http://localhost:5000"
+    experiment_name: "aurix-credit-risk"
+    registry_model_name: "aurix-credit-risk"
+
 serving:
   host: "0.0.0.0"
   port: 8000

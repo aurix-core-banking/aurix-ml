@@ -55,6 +55,8 @@ class DefaultPredictionModel:
         return df[self.feature_columns].fillna(0)
 
     def train(self, df: pd.DataFrame, target_column: str = "inadimplente"):
+        # Reproductibilidade das features sintéticas geradas em prepare_features.
+        np.random.seed(42)
         if target_column not in df.columns:
             df[target_column] = (
                 (df.get("dias_atraso_medio", 0) > 30)

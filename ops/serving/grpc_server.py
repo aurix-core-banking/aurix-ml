@@ -37,13 +37,23 @@ LATENCY = Histogram("aurix_ml_grpc_latency_seconds", "gRPC latency", ["service"]
 model_data = {}
 
 
+def _resolver_pkl(name):
+    """Resolve o .pkl para onde o treino realmente grava (ops/models ou models/)."""
+    base = Path(__file__).resolve().parents[2] / "models"     # aurix-ml/models
+    ops_models = Path(__file__).resolve().parents[1] / "models"  # aurix-ml/ops/models
+    for raiz in [ops_models, base]:
+        pkl = raiz / f"{name}.pkl"
+        if pkl.exists():
+            return pkl
+    return base / f"{name}.pkl"
+
+
 def load_models():
     import joblib
-    import pandas as pd
 
-    base = Path(__file__).resolve().parents[2] / "models"
-    for name in ["fraud_detection_model", "default_prediction_model", "customer_segmentation_model"]:
-        pkl = base / f"{name}.pkl"
+    for name in ["fraud_detection_model", "default_prediction_model",
+                 "customer_segmentation_model", "credit_risk_model"]:
+        pkl = _resolver_pkl(name)
         if pkl.exists():
             model_data[name] = joblib.load(pkl)
             logger.info("Loaded %s", pkl)
@@ -150,17 +160,49 @@ class CreditAnalysisServicer(CreditAnalysisServiceServicer):
         decision_id = str(uuid.uuid4())
 
         try:
-            if model_data.get("fraud_detection_model") is not None:
-                from fraud_detection_model import CreditScoringModel
-                scorer = CreditScoringModel()
-                score = scorer.predict([[
-                    float(request.monthly_income),
-                    float(request.existing_debt),
-                    float(request.requested_amount),
-                    float(request.payment_history_months),
-                ]])[0]
+            renda = max(float(request.monthly_income), 1.0)
+            comprometimento = float(request.existing_debt) / renda
+
+            if model_data.get("credit_risk_model") is not None:
+                import pandas as pd
+                from credit_risk_model import CreditRiskModel
+
+                dados = model_data["credit_risk_model"]
+                model = CreditRiskModel()
+                model.model = dados["modelo"]
+                model.metadata = dados.get("metadata", {})
+                model.feature_columns = model.metadata.get("features", [])
+                model.is_trained = True
+
+                df = pd.DataFrame([{
+                    "id_cliente": 0,
+                    "renda_mensal": renda,
+                    "idade": 35,
+                    "pessoas_residencia": 1,
+                    "escolaridade": "MEDIO",
+                    "estado_civil": "SOLTEIRO",
+                    "tipo_empregador": "CLT",
+                    "cidade": "Campinas",
+                    "data_abertura": "2020-01-01",
+                    "score_bureau": int(request.credit_score) if request.credit_score > 0 else 600,
+                    "atrasos_hist": 0,
+                    "consultas_ultimo_6m": 0,
+                    "total_dividas": float(request.existing_debt),
+                    "total_financiado": float(request.requested_amount),
+                    "valor_parcela": float(request.requested_amount) * 0.03,
+                    "saldo_medio_12m": 0.0,
+                    "saldo_atual": 0.0,
+                    "numero_operacoes_credito": 0,
+                    "possui_imovel": 0,
+                    "possui_veiculo": 0,
+                }])
+
+                proba = float(model.predict_proba(df)[0])
+                score = int(model.predict_score(df)[0])
             else:
-                score = 500.0
+                # Fallback determinístico enquanto o modelo de crédito não é treinado.
+                proba = 0.15
+                score = int(np.clip(700 - float(request.existing_debt) / 50.0, 300, 850))
 
             if score >= 700:
                 risk_level = "LOW"
@@ -172,13 +214,28 @@ class CreditAnalysisServicer(CreditAnalysisServiceServicer):
                 risk_level = "HIGH"
                 decision = "REJECTED"
 
+            suggested_limit = float(request.requested_amount * score / 1000.0)
+            if score < 400:
+                suggested_limit = 0.0
+
+            positive_factors = []
+            risk_factors = []
+            if request.payment_history_months >= 24:
+                positive_factors.append("Histórico de pagamentos superior a 24 meses")
+            if request.limit_utilization > 0.8:
+                risk_factors.append("Limite atual com utilização acima de 80%")
+            if comprometimento > 0.5:
+                risk_factors.append("Comprometimento de renda acima de 50%")
+
             return CreditAnalysisResponse(
                 credit_score=float(score),
-                default_probability=max(0, min(1, (700 - score) / 700)),
-                suggested_limit=float(request.requested_amount * score / 1000),
+                default_probability=round(max(0.0, min(1.0, proba)), 6),
+                suggested_limit=round(suggested_limit, 2),
                 risk_level=risk_level,
                 decision=decision,
                 justification=f"Score {score:.0f} — {decision}",
+                positive_factors=positive_factors,
+                risk_factors=risk_factors,
                 decision_id=decision_id,
                 processing_time_ms=int((time.time() - start) * 1000),
             )
